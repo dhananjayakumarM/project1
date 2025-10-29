@@ -1,0 +1,180 @@
+Suppose I have two accounts,
+
+https://github.com/dhananjayvarma123@gmail.com
+https://github.com/jeevanfar1995@gmail.com
+I would configure my system with both the accounts so that I can work on my official and personal projects both.
+
+To do this, follow the below steps
+
+1. Generate SSH keys for all the accounts
+
+create .ssh folder and change directory to cd ~/.ssh
+
+  ssh-keygen -t rsa -C "dhananjayvarma123@gmail.com" -f "dhananjay"
+  ssh-keygen -t rsa -C "jeevanfar1995@gmail.com" -f "jeevan-far"
+
+-C is for adding a comment, it can be anything, but it will be helpful to know the email associated with your account.
+-f is to define a filename, and creating a key with a descriptive name will help you remember which key is used for which user
+
+
+Now in .ssh folder, a public and a private key will be generated. Public key will have an extension .pub and private key will be without any extension both having same name which we have passed after -f option in the above command.
+
+10/29/2025  10:02 PM             2,610 dhananjay
+10/29/2025  10:02 PM               582 dhananjay.pub
+10/29/2025  10:04 PM             2,610 jeevan-far
+10/29/2025  10:04 PM               578 jeevan-far.pub
+
+2. Add SSH keys to SSH Agent
+We will add above generated keys to ssh-agent.
+
+In a new admin elevated PowerShell window, ensure the ssh-agent is running. You can use the "Auto-launching the ssh-agent" instructions in Working with SSH key passphrases, or start it manually:
+
+# start the ssh-agent in the background
+Get-Service -Name ssh-agent | Set-Service -StartupType Manual
+Start-Service ssh-agent
+
+In a terminal window without elevated permissions, add your SSH private key to the ssh-agent. If you created your key with a different name, or if you are adding an existing key that has a different name, replace id_ed25519 in the command with the name of your private key file.
+
+
+ssh-add ~/.ssh/dhananjay
+ssh-add ~/.ssh/jeevan-far
+
+3. Add SSH public key to the Github
+Now we need to add our public keys to corresponding github accounts.
+
+3.1. Copy the public key
+
+     open in notepad ~/.ssh/dhananjay.pub & copy the content
+     open in notepad ~/.ssh/jeevan-far.pub & copy the content
+3.2. Paste the public key in Github
+
+Do this for each key/account one by one.
+Sign in to corresponding Github account.
+Go to Settings > SSH and GPG keys > New SSH Key
+Paste respective copied public key content. Title can be of your choice.
+
+
+4. Create or Edit Config File and Make Host Entries
+In .ssh folder, look for config file. If config file doesn't exist then create one (make sure to be in ~/.ssh directory)
+
+Directory of C:\Users\bhags\.ssh
+10/29/2025  11:11 PM    <DIR>          .
+10/29/2025  11:03 PM    <DIR>          ..
+10/29/2025  10:38 PM               226 config
+10/29/2025  10:02 PM             2,610 dhananjay
+10/29/2025  10:02 PM               582 dhananjay.pub
+10/29/2025  10:04 PM             2,610 jeevan-far
+10/29/2025  10:04 PM               578 jeevan-far.pub
+10/29/2025  11:11 PM               828 known_hosts
+10/29/2025  10:58 PM                92 known_hosts.old
+               7 File(s)          7,526 bytes
+               2 Dir(s)  14,836,301,824 bytes free
+created config file successfully manually
+
+
+Add below lines in config file.
+
+
+     Host dhananjay
+         HostName github.com
+         User git
+         IdentityFile ~/.ssh/dhananjay
+    
+     Host jeevan-far
+         HostName github.com
+         User git
+         IdentityFile ~/.ssh/jeevan-far
+
+
+
+
+suppose i am working in D:\practise\assignments_to_git folder
+i want to push this to https://github.com/jeevan-far/project1
+
+then i will do
+git remote set-url origin git@jeevan-far:jeevan-far/project1.git
+
+git remote -v
+
+output will be
+origin  git@jeevan-far:jeevan-far/project1.git (fetch)
+origin  git@jeevan-far:jeevan-far/project1.git (push)
+
+
+
+git add .
+git commit -m "commit message"
+git push origin main
+
+so all the files will be pushed to main branch of jeevan-far/project1.git
+
+
+similarly if i want to change the remote origin then i will do
+git remote set-url origin git@dhananjay:dhananjayakumarM/project1.git
+
+and check git remote -v
+then output will be
+
+origin  git@dhananjay:dhananjayakumarM/project1.git (fetch)
+origin  git@dhananjay:dhananjayakumarM/project1.git (push)
+
+after confirming i will 
+
+git add .
+git commit -m "commit message"
+git push origin main
+
+
+
+
+additional steps ///extra to experiment when free
+
+
+5. Clone GitHub repositories using different accounts
+Now to clone https://github.com/chalokodekare/work-with-multiple-github-accounts.git, we can use any account:
+
+    git clone {your-host-in-config-file}:{owner-user-name}/{the-repo-name}.git
+
+    [e.g.] git clone dhananjay:chalokodekare/work-with-multiple-github-accounts.git
+        or git clone jeevan-far:chalokodekare/work-with-multiple-github-accounts.git
+Clone repository Image
+
+6. Configure User Name & Email
+To make sure our commits in each repository uses the correct GitHub user — we will have to configure user.email and user.name in all existing or newly cloned repositories.
+
+     git config user.email "jeevanfar1995@gmail.com"
+     git config user.name "jeevan-far"
+     
+     or 
+     git config user.email "dhananjayvarma123@gmail.com"
+     git config user.name "dhananjay"
+     
+     depending on which account you're using.
+Pick the correct pair for your repository accordingly.
+
+You can verify global user name and email id using below commands.
+
+     git config --global user.email   
+     git config --global user.name
+Now you can use:
+
+     git push
+     
+     git pull
+7. Verify remote
+To verify if your remote is pointing correctly, you can do:
+
+    git remote -v
+Verify remote Image
+
+remove & add correct remote if incorrect.
+
+To remove existing remote
+
+git remote remove origin
+To add new remote
+
+git remote add origin dhananjay:chalokodekare/work-with-multiple-github-accounts.git
+
+
+
